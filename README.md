@@ -48,29 +48,20 @@ Instead of manually running `find`, `top`, and `df` on every box, `sysaudit.py` 
 
 ```mermaid
 flowchart TD
-    A["CLI Entry Point<br/>main()"] --> B["parse_cli_arguments()<br/>--path / --threshold / --json"]
-    B --> C1["check_permissions(path)"]
-    B --> C2["check_processes(limit=5)"]
-    B --> C3["check_disk(threshold)"]
-
-    C1 --> D["Aggregate results<br/>into report dict"]
+    A[CLI Entry Point: main] --> B[parse_cli_arguments]
+    B --> C1[check_permissions]
+    B --> C2[check_processes]
+    B --> C3[check_disk]
+    C1 --> D[Aggregate into report dict]
     C2 --> D
     C3 --> D
-
-    D --> E{"--json flag set?"}
-    E -->|Yes| F["json.dumps(report)<br/>→ stdout"]
-    E -->|No| G["render_text(report)<br/>→ formatted terminal output"]
-
-    F --> H{"audit_passed?"}
+    D --> E{json flag set?}
+    E -- Yes --> F[Print JSON to stdout]
+    E -- No --> G[render_text formatted output]
+    F --> H{audit_passed?}
     G --> H
-    H -->|True| I["sys.exit(0)<br/>✅ Success"]
-    H -->|False| J["sys.exit(1)<br/>❌ Failure — CI/cron detects this"]
-
-    style A fill:#4C566A,color:#fff
-    style D fill:#5E81AC,color:#fff
-    style H fill:#BF616A,color:#fff
-    style I fill:#A3BE8C,color:#000
-    style J fill:#BF616A,color:#fff
+    H -- True --> I[Exit code 0: Success]
+    H -- False --> J[Exit code 1: Failure]
 ```
 
 **Reading the diagram:** the script follows a strict **gather → aggregate → render → exit** pipeline. Each check (`check_permissions`, `check_processes`, `check_disk`) is an independent, pure-ish function that takes simple arguments and returns a plain list of dictionaries — no shared state, no side effects other than logging. This is what makes the script easy to unit test and easy to extend (adding a 4th check means adding one function and one line in `main()`).
