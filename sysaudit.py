@@ -4,7 +4,7 @@ import logging
 import os
 import stat
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 try:
@@ -146,7 +146,7 @@ def main():
     
     # Aggregate into a single state report
     report = {
-        "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%SZ"),
+        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ"),
         "unsafe_files": unsafe_files,
         "top_processes": top_procs,
         "disk_warnings": disk_warnings,
