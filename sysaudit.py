@@ -108,7 +108,7 @@ def check_disk(threshold_percent: int) -> list[dict]:
 def render_text(report: dict):
     """Prints a clean, colorized (optional) terminal interface for operators."""
     print("\n" + "="*50)
-    print(f"📋 SYSTEM AUDIT REPORT - {report['timestamp']}")
+    print(f"📋 SYSTEM AUDIT REPORT -- {report['timestamp']}")
     print("="*50)
 
     # 1. File permissions
