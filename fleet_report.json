@@ -1,0 +1,297 @@
+{
+  "127.0.0.1": {
+    "ip": "127.0.0.1",
+    "status": "ONLINE",
+    "success": false,
+    "audit": {
+      "timestamp": "2026-07-17 18:32:59Z",
+      "unsafe_files": [
+        {
+          "path": "/home/ayoub/GitByBit/gitbybit-part1/.git/objects/18/b37fb78e4c0988c272a7bb889561b74f3a3055",
+          "permissions": "0o666",
+          "size": 55
+        },
+        {
+          "path": "/home/ayoub/GitByBit/gitbybit-part1/.git/objects/b4/5ef6fec89518d314f546fd6c3025367b721684",
+          "permissions": "0o666",
+          "size": 29
+        },
+        {
+          "path": "/home/ayoub/GitByBit/gitbybit-part1/.git/objects/3a/dfb12c5eb85961185585af1c4e706afba416e6",
+          "permissions": "0o666",
+          "size": 174
+        },
+        {
+          "path": "/home/ayoub/GitByBit/gitbybit-part1/.git/objects/2d/6a7432d4f654192edc9c34c93d5b32d35a7d83",
+          "permissions": "0o666",
+          "size": 37
+        },
+        {
+          "path": "/home/ayoub/GitByBit/gitbybit-part1/.git/objects/34/59e0bebbbf42a5ebb6d87763846c2a030e3c00",
+          "permissions": "0o666",
+          "size": 129
+        },
+        {
+          "path": "/home/ayoub/GitByBit/gitbybit-part1/.git/objects/02/7def9b7bcaa390ac2f546a3940f91137fa2900",
+          "permissions": "0o666",
+          "size": 55
+        },
+        {
+          "path": "/home/ayoub/GitByBit/gitbybit-part1/.git/objects/46/21772127085f7cc3bbb7c3b99a71d38e40c823",
+          "permissions": "0o666",
+          "size": 188
+        },
+        {
+          "path": "/home/ayoub/GitByBit/gitbybit-part1/.git/objects/03/15337f6c6cafba44a254f4cea89adb257c6e56",
+          "permissions": "0o666",
+          "size": 157
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/prefs.js",
+          "permissions": "0o777",
+          "size": 44811
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/translations.js",
+          "permissions": "0o777",
+          "size": 144
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/stylesheet.css",
+          "permissions": "0o777",
+          "size": 5184
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/prefs.css",
+          "permissions": "0o777",
+          "size": 510
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/keybindings.js",
+          "permissions": "0o777",
+          "size": 11559
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/dbus.js",
+          "permissions": "0o777",
+          "size": 600
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/polyfill.js",
+          "permissions": "0o777",
+          "size": 245
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/resources.gresource",
+          "permissions": "0o777",
+          "size": 8639
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/extension.js",
+          "permissions": "0o777",
+          "size": 21619
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/monitorDescription.js",
+          "permissions": "0o777",
+          "size": 381
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/utils/touch.js",
+          "permissions": "0o777",
+          "size": 1603
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/utils/signalHandling.js",
+          "permissions": "0o777",
+          "size": 926
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/utils/gnomesupport.js",
+          "permissions": "0o777",
+          "size": 1037
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/utils/gjs.js",
+          "permissions": "0o777",
+          "size": 270
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/utils/logger.js",
+          "permissions": "0o777",
+          "size": 260
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/utils/ui.js",
+          "permissions": "0o777",
+          "size": 4781
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/utils/globalState.js",
+          "permissions": "0o777",
+          "size": 10111
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/indicator/layoutButton.js",
+          "permissions": "0o777",
+          "size": 1469
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/indicator/indicator.js",
+          "permissions": "0o777",
+          "size": 6992
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/indicator/utils.js",
+          "permissions": "0o777",
+          "size": 1206
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/indicator/defaultMenu.js",
+          "permissions": "0o777",
+          "size": 12070
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/indicator/editingMenu.js",
+          "permissions": "0o777",
+          "size": 1808
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/gi/prefs.js",
+          "permissions": "0o777",
+          "size": 192
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/gi/ext.js",
+          "permissions": "0o777",
+          "size": 406
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/gi/shared.js",
+          "permissions": "0o777",
+          "size": 131
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/icons/add-symbolic.svg",
+          "permissions": "0o777",
+          "size": 477
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/icons/delete-symbolic.svg",
+          "permissions": "0o777",
+          "size": 1421
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/icons/info-symbolic.svg",
+          "permissions": "0o777",
+          "size": 788
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/icons/prefs-symbolic.svg",
+          "permissions": "0o777",
+          "size": 9188
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/icons/cancel-symbolic.svg",
+          "permissions": "0o777",
+          "size": 752
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/icons/edit-symbolic.svg",
+          "permissions": "0o777",
+          "size": 1222
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/icons/chevron-left-symbolic.svg",
+          "permissions": "0o777",
+          "size": 641
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/icons/save-symbolic.svg",
+          "permissions": "0o777",
+          "size": 1496
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/icons/menu-symbolic.svg",
+          "permissions": "0o777",
+          "size": 937
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/icons/indicator-symbolic.svg",
+          "permissions": "0o777",
+          "size": 528
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/icons/chevron-right-symbolic.svg",
+          "permissions": "0o777",
+          "size": 681
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml",
+          "permissions": "0o777",
+          "size": 14462
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/settings/settingsOverride.js",
+          "permissions": "0o777",
+          "size": 3657
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/settings/settings.js",
+          "permissions": "0o777",
+          "size": 20023
+        },
+        {
+          "path": "/home/ayoub/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/settings/settingsExport.js",
+          "permissions": "0o777",
+          "size": 2189
+        }
+      ],
+      "top_processes": [
+        {
+          "cpu_percent": 0.0,
+          "pid": 29419,
+          "name": "brave",
+          "memory_percent": 9.25
+        },
+        {
+          "cpu_percent": 0.0,
+          "pid": 118830,
+          "name": "brave",
+          "memory_percent": 8.44
+        },
+        {
+          "cpu_percent": 0.0,
+          "pid": 5765,
+          "name": "code",
+          "memory_percent": 5.97
+        },
+        {
+          "cpu_percent": 0.0,
+          "pid": 113630,
+          "name": "brave",
+          "memory_percent": 5.47
+        },
+        {
+          "cpu_percent": 0.0,
+          "pid": 5799,
+          "name": "code",
+          "memory_percent": 5.22
+        }
+      ],
+      "disk_warnings": [],
+      "summary": {
+        "total_findings": 48,
+        "high_risk_findings": 48,
+        "permission_breakdown": {
+          "0o666": 8,
+          "0o777": 40
+        },
+        "disk_warning_count": 0
+      },
+      "audit_passed": false
+    },
+    "error": null,
+    "raw_stderr": null
+  }
+}

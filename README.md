@@ -126,8 +126,17 @@ python3 sysaudit.py
 # Audit a specific directory (e.g., a web server's public folder)
 python3 sysaudit.py --path /var/www/html
 
+# Run a YAML-driven audit using auditor_config.yaml
+python3 sysaudit.py --config auditor_config.yaml --json
+
 # Lower the disk alarm threshold to 75%
 python3 sysaudit.py --threshold 75
+
+# Exclude noisy paths such as .git or node_modules
+python3 sysaudit.py --config auditor_config.yaml --exclude .git/* node_modules/*
+
+# Limit the number of findings shown in text mode
+python3 sysaudit.py --config auditor_config.yaml --max-findings 10
 
 # Get machine-readable JSON (great for piping into jq or a log shipper)
 python3 sysaudit.py --path /etc --json | jq .
@@ -143,6 +152,10 @@ python3 sysaudit.py --path /srv/app --threshold 85 || echo "Audit failed — ale
 | `--path` | `str` | `.` (current dir) | Directory to recursively scan for world-writable files. |
 | `--threshold` | `int` | `90` | Disk usage percentage that triggers a warning. |
 | `--json` | flag | `False` | Print output as JSON instead of the formatted terminal report. |
+| `--config` / `--config-path` | `str` | `None` | Path to a YAML file containing scoped scan targets. |
+| `--exclude` | list | `[]` | Extra path globs to skip during scanning. |
+| `--max-findings` | `int` | `20` | Maximum number of findings to print in text mode. |
+| `--only-failures` | flag | `False` | Show only the summary and finding list in text mode. |
 
 ---
 

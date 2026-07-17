@@ -1,0 +1,39 @@
+# ==============================================================================
+# Local System Auditor - Configuration File
+# Use this file to define scoped targets and audit rules for specific subsystems.
+# ==============================================================================
+
+global_settings:
+  output_format: "json"       # Options: json, yaml, text
+  follow_symlinks: false      # Prevent accidental infinite loops in system paths
+  show_owner_group: true      # Include UID/GID in the final metadata output
+
+# ------------------------------------------------------------------------------
+# Targeted Subsystems
+# Define only the specific areas an engineer needs to analyze.
+# ------------------------------------------------------------------------------
+targets:
+
+  - name: "vscode_gitbybit_storage"
+    path: "~/.config/Code/User/globalStorage/gitbybit"
+    max_depth: 3              # Limits how deep the scanner recurses
+    ignore_patterns:
+      - "*.log"
+      - "cache/*"
+    alert_on_permissive: true # Flag if files have 0o777 or 0o666 permissions
+
+  - name: "git_development_repos"
+    path: "~/GitByBit"
+    max_depth: 4
+    ignore_patterns:
+      - ".git/objects/*"      # Ignore heavy binary object trees to speed up audit
+      - ".git/hooks/*.sample" # Skip boilerplate sample hooks
+    alert_on_permissive: false
+
+  - name: "gnome_shell_extensions"
+    path: "~/.local/share/gnome-shell/extensions"
+    max_depth: 2              # Only check top-level extension structure
+    ignore_patterns:
+      - "*.png"               # Skip asset files
+      - "schemas/*"
+    alert_on_permissive: true
