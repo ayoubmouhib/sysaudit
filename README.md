@@ -7,6 +7,8 @@
 
 A lightweight, dependency-minimal **CLI auditing tool** that inspects a machine's file permissions, running processes, and disk usage — then reports back in either human-readable or machine-readable (JSON) form, with **CI/cron-friendly exit codes**.
 
+The tool now also supports **YAML-driven scoped audits** via [auditor_config.yaml](auditor_config.yaml), so one run can scan multiple directories with custom recursion depth, exclusion rules, and permissive-permission handling.
+
 Built as part of a Python-for-DevSecOps learning track, focused on `psutil`, `pathlib`, and clean CLI tool design.
 
 ---
@@ -49,22 +51,24 @@ Instead of manually running `find`, `top`, and `df` on every box, `sysaudit.py` 
 ```mermaid
 flowchart TD
     A[CLI Entry Point: main] --> B[parse_cli_arguments]
-    B --> C1[check_permissions]
-    B --> C2[check_processes]
-    B --> C3[check_disk]
-    C1 --> D[Aggregate into report dict]
-    C2 --> D
+    B --> C1[load YAML config if provided]
+    C1 --> C2[check_permissions]
+    B --> C3[check_processes]
+    B --> C4[check_disk]
+    C2 --> D[Aggregate into report dict]
     C3 --> D
-    D --> E{json flag set?}
-    E -- Yes --> F[Print JSON to stdout]
-    E -- No --> G[render_text formatted output]
-    F --> H{audit_passed?}
-    G --> H
-    H -- True --> I[Exit code 0: Success]
-    H -- False --> J[Exit code 1: Failure]
+    C4 --> D
+    D --> E[build_summary]
+    E --> F{json flag set?}
+    F -- Yes --> G[Print JSON to stdout]
+    F -- No --> H[render_text formatted output]
+    G --> I{audit_passed?}
+    H --> I
+    I -- True --> J[Exit code 0: Success]
+    I -- False --> K[Exit code 1: Failure]
 ```
 
-**Reading the diagram:** the script follows a strict **gather → aggregate → render → exit** pipeline. Each check (`check_permissions`, `check_processes`, `check_disk`) is an independent, pure-ish function that takes simple arguments and returns a plain list of dictionaries — no shared state, no side effects other than logging. This is what makes the script easy to unit test and easy to extend (adding a 4th check means adding one function and one line in `main()`).
+**Reading the diagram:** the script follows a strict **gather → summarize → render → exit** pipeline. When a YAML config is supplied, the tool expands each target path and applies the configured recursion depth, ignore rules, and permissive-permission policy. Results are then summarized into a compact metadata block before being emitted as JSON or human-readable output.
 
 ---
 
@@ -72,10 +76,11 @@ flowchart TD
 
 | Check | What it does | Flag(s) |
 |---|---|---|
-| 🔒 **Permission Audit** | Recursively scans a directory for files with the world-writable bit (`o+w`) set — a common misconfiguration that lets *any* local user modify a file. | `--path` |
+| 🔒 **Permission Audit** | Recursively scans a directory for files with the world-writable bit (`o+w`) set — a common misconfiguration that lets *any* local user modify a file. | `--path`, `--config` |
 | 🔥 **Process Monitor** | Lists the top N processes by CPU and memory usage using live OS data. | *(built-in, top 5)* |
 | 💾 **Disk Usage Check** | Scans all real (non-loopback) mounted partitions and flags any exceeding a usage threshold. | `--threshold` |
 | 🖨️ **Dual Output Modes** | Human-readable terminal report with emoji/status markers, or strict JSON for piping into `jq`, log aggregators, or other scripts. | `--json` |
+| 🧭 **Scoped YAML Targets** | Reads targets and rules from [auditor_config.yaml](auditor_config.yaml) for multi-target scans with custom depth and ignore patterns. | `--config` |
 | 🤖 **Automation-Ready** | Returns exit code `0` (pass) or `1` (fail) — pluggable directly into cron, systemd, or CI pipelines. | *(automatic)* |
 
 ---
@@ -84,14 +89,15 @@ flowchart TD
 
 | Library | Standard Lib? | Purpose in this project |
 |---|---|---|
-| [`argparse`](https://docs.python.org/3/library/argparse.html) | ✅ Yes | Parses `--path`, `--threshold`, and `--json` into a clean `Namespace` object instead of manually parsing `sys.argv`. Gives free `--help` output and type validation. |
-| [`pathlib`](https://docs.python.org/3/library/pathlib.html) | ✅ Yes | Object-oriented filesystem paths. Used via `Path.rglob("*")` for recursive traversal instead of `os.walk`, and `.stat()` / `.owner()` for metadata — cleaner and more readable than raw `os` string-path manipulation. |
-| [`stat`](https://docs.python.org/3/library/stat.html) | ✅ Yes | Provides the `S_IWOTH` bitmask constant used to test the "world-writable" permission bit against a file's raw `st_mode` integer. This is the **correct** way to check Unix permissions — never parse `ls -l` text output. |
+| [`argparse`](https://docs.python.org/3/library/argparse.html) | ✅ Yes | Parses CLI flags such as `--path`, `--threshold`, `--config`, `--exclude`, `--max-findings`, and `--only-failures` into a clean `Namespace` object. |
+| [`pathlib`](https://docs.python.org/3/library/pathlib.html) | ✅ Yes | Used for path normalization, existence checks, and writing the output report file in the fleet wrapper. |
+| [`stat`](https://docs.python.org/3/library/stat.html) | ✅ Yes | Used to inspect file mode bits and determine whether a file is permissive or world-writable. |
 | [`json`](https://docs.python.org/3/library/json.html) | ✅ Yes | Serializes the final report dictionary into machine-readable output for `--json` mode. |
-| [`logging`](https://docs.python.org/3/library/logging.html) | ✅ Yes | Structured, timestamped diagnostic messages (e.g., path-not-found warnings) — safer and more configurable than scattering `print()` calls. |
+| [`logging`](https://docs.python.org/3/library/logging.html) | ✅ Yes | Structured, timestamped diagnostic messages for CLI and fleet operations. |
 | [`datetime`](https://docs.python.org/3/library/datetime.html) | ✅ Yes | Stamps every report with a UTC timestamp so results are traceable when logs pile up over time. |
-| [`sys`](https://docs.python.org/3/library/sys.html) | ✅ Yes | Used for `sys.exit(code)` (automation-friendly termination) and `sys.stderr` (so error messages don't pollute `--json` stdout output). |
-| [`psutil`](https://psutil.readthedocs.io/) | ❌ Third-party | Cross-platform (Linux/macOS/Windows) access to process lists, CPU/memory percentages, disk partitions, and disk usage — abstracting away the need to manually parse `/proc` on Linux or use OS-specific syscalls. The industry-standard library for this. |
+| [`sys`](https://docs.python.org/3/library/sys.html) | ✅ Yes | Used for automation-friendly exit codes and stderr handling. |
+| [`psutil`](https://psutil.readthedocs.io/) | ❌ Third-party | Cross-platform access to process lists, CPU/memory percentages, disk partitions, and disk usage. |
+| [`yaml`](https://pyyaml.org/) | ❌ Third-party | Parses [auditor_config.yaml](auditor_config.yaml) and turns its `targets` section into scoped scan instructions. |
 
 > 💡 **Why no `subprocess` calls to `ps`, `df`, or `find`?**
 > Shelling out to system binaries and parsing their text output is fragile (output format varies by OS/locale) and can introduce **command injection risks** if any part of the command is built from user input. `psutil` and `pathlib` give the same data through safe, structured Python APIs — no shell involved.
@@ -109,11 +115,11 @@ cd sysaudit
 python3 -m venv venv
 source venv/bin/activate   # On Windows: venv\Scripts\activate
 
-# Install the only dependency
-pip install psutil
+# Install the runtime dependencies
+pip install -r requirements.txt
 ```
 
-> The script also gracefully self-checks for `psutil` at import time and exits with a clear installation instruction if it's missing — no cryptic `ModuleNotFoundError` traceback.
+> The script also gracefully self-checks for `psutil` and `PyYAML` at import time and exits with a clear installation instruction if either dependency is missing — no cryptic `ModuleNotFoundError` traceback.
 
 ---
 
@@ -157,6 +163,28 @@ python3 sysaudit.py --path /srv/app --threshold 85 || echo "Audit failed — ale
 | `--max-findings` | `int` | `20` | Maximum number of findings to print in text mode. |
 | `--only-failures` | flag | `False` | Show only the summary and finding list in text mode. |
 
+### YAML Configuration Format
+
+The YAML config supports a top-level `global_settings` block and a `targets` list. Each target can define:
+
+```yaml
+global_settings:
+  output_format: "json"
+  follow_symlinks: false
+  show_owner_group: true
+
+targets:
+  - name: "example_target"
+    path: "~/example"
+    max_depth: 3
+    ignore_patterns:
+      - "*.log"
+      - "cache/*"
+    alert_on_permissive: true
+```
+
+The current implementation uses the `targets` entries to scan each configured directory and collect findings into one unified report.
+
 ---
 
 ## 🖥️ Sample Output
@@ -181,19 +209,23 @@ python3 sysaudit.py --path /srv/app --threshold 85 || echo "Audit failed — ale
 ==================================================
 ```
 
-**JSON mode (`python3 sysaudit.py --json`):**
+**JSON mode (`python3 sysaudit.py --config auditor_config.yaml --json`):**
 ```json
 {
-  "timestamp": "2026-07-16 14:32:10Z",
+  "timestamp": "2026-07-17 18:31:59Z",
   "unsafe_files": [
-    {"file": "/tmp/shared_script.sh", "permissions": "0o777", "owner": "root"}
+    {"path": "/home/user/project/.git/objects/abc", "permissions": "0o666", "size": 55}
   ],
   "top_processes": [
-    {"pid": 4821, "name": "chrome", "cpu_percent": 24.5, "memory_percent": 8.32}
+    {"pid": 4821, "name": "chrome", "cpu_percent": 0.0, "memory_percent": 8.32}
   ],
-  "disk_warnings": [
-    {"device": "/dev/sda1", "mount_point": "/", "total_gb": 200.0, "used_gb": 184.8, "percent_used": 92.4, "threshold": 90}
-  ],
+  "disk_warnings": [],
+  "summary": {
+    "total_findings": 48,
+    "high_risk_findings": 48,
+    "permission_breakdown": {"0o666": 8, "0o777": 40},
+    "disk_warning_count": 0
+  },
   "audit_passed": false
 }
 ```
@@ -217,19 +249,24 @@ This makes the script a drop-in health-check step for:
 ## 📂 Project Structure
 
 ```
-sysaudit/
-├── sysaudit.py       # Main script — all logic lives here (single-file CLI tool)
-├── README.md         # You are here
-└── requirements.txt  # psutil
+Automation/
+├── sysaudit.py           # Local audit engine with YAML config support
+├── fleetaudit.py         # SSH-based fleet wrapper that pushes the audit script to remote hosts
+├── auditor_config.yaml   # Example YAML targets and rules for multi-scope audits
+├── hosts.txt             # Inventory of remote hosts for fleet mode
+├── fleet_report.json     # Generated aggregate report from a fleet run
+├── requirements.txt      # Runtime dependencies: psutil and PyYAML
+└── README.md             # Project documentation
 ```
 
 ---
 
 ## 🧠 Design Decisions & Trade-offs
 
-- **Single-file script over a package:** at this scope, one file is easier to read, review, and deploy (just `scp` it to a server) than a multi-module package. This will change if the tool grows plugin-style checks.
-- **`Path.rglob` over `os.walk`:** more Pythonic and readable, at the cost of slightly less control over traversal (e.g., can't easily prune directories mid-walk the way `os.walk` allows). Acceptable trade-off for an audit tool run on bounded directories.
-- **Silent `continue` on `PermissionError`:** scanning `/` as a non-root user *will* hit directories you can't read. Skipping them (rather than crashing) keeps the audit useful, though it means the report reflects "what I could see," not "the whole truth." This is called out here so it's not a silent blind spot.
+- **Single-file script over a package:** at this scope, one file is easier to read, review, and deploy (just `scp` it to a server) than a multi-module package. This remains true for now, though the fleet wrapper is intentionally separate for SSH orchestration.
+- **YAML-driven target definitions over hard-coded CLI-only paths:** this makes the tool more flexible for scoped audits, especially across developer repos and extension directories.
+- **Silent `continue` on `PermissionError`:** scanning directories as a non-root user can hit access-restricted paths. Skipping them keeps the audit useful, though it means the report reflects what the current account could inspect.
+- **Default exclusions for noisy paths:** the permission scan now skips common directories such as `.git`, `node_modules`, and caches by default to reduce noise and keep the report focused.
 - **`cpu_percent` on first call:** `psutil.process_iter` with `cpu_percent` in the attribute list returns `0.0` (or `None`) on the very first sample for each process, since CPU% requires two measurements over an interval. This is a known `psutil` quirk — good enough for a snapshot tool, but worth knowing if the numbers look suspiciously low on a fresh run.
 
 ---
@@ -237,19 +274,19 @@ sysaudit/
 ## ⚠️ Known Limitations
 
 - CPU percentages are a **single instantaneous sample**, not an average over time — for trend analysis, the script would need to sample twice with a delay (`psutil.cpu_percent(interval=1)`).
-- Does not currently support **remote hosts** — this is intentionally a local-only tool (see the companion project: an SSH-based fleet auditor, coming next in this series).
-- `path.owner()` can raise on some systems (e.g., Windows, or UIDs with no matching user entry) — currently caught defensively but reported as `"unknow"` (see Roadmap).
+- The new fleet mode is SSH-based and remote-target aware, but it still assumes key-based access and a reachable inventory list.
+- The YAML config is currently used for target discovery and rule application, but it does not yet support every possible filesystem policy or custom output schema.
 
 ---
 
 ## 🗺️ Roadmap
 
-- [ ] Fix typo: `"unknow"` → `"unknown"`
-- [ ] Add `--exclude` flag to skip noisy directories (`node_modules`, `.git`, etc.)
+- [x] Add `--exclude` flag to skip noisy directories (`node_modules`, `.git`, etc.)
+- [x] Add a `--config` option to load targets and rules from a YAML file
 - [ ] Add unit tests (`pytest`) with mocked `psutil` calls
-- [ ] Add a `--config` option to load thresholds from a YAML file
 - [ ] Package as a proper CLI entry point (`pip install .` → `sysaudit` command)
 - [ ] Add SUID/SGID binary detection alongside world-writable checks
+- [ ] Add richer severity levels and remediation hints in the output schema
 
 ---
 
